@@ -77,4 +77,6 @@ dependencies {
 
     implementation(libs.hilt.work)
     ksp(libs.hilt.compiler.androidx)
+
+    implementation(libs.androidx.startup)
 }
