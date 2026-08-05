@@ -37,7 +37,7 @@ class TransactionRepositoryImpl @Inject constructor(
         transactionDao.markDeleted(transactionId, Clock.System.now().toEpochMilliseconds())
     }
 
-    override fun observePendngTransactionCount(): Flow<Int> {
+    override fun observePendingTransactionCount(): Flow<Int> {
         return transactionDao.observePendingCount()
     }
 }

@@ -1,7 +1,8 @@
 package com.example.core.domain.sync
 
 interface SyncEngine {
-    suspend fun syncTransactions(): SyncResult
+    val entityName: String
+    suspend fun sync(): SyncResult
 }
 
 sealed interface SyncResult {

@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.core.domain.model.Budget
+import com.google.firebase.firestore.DocumentSnapshot
 
 @Entity(tableName = "budgets",
         foreignKeys = [ForeignKey(
@@ -32,3 +33,28 @@ fun BudgetEntity.toDomain() = Budget(
     limitCents = limitCents,
     isDeleted = isDeleted
 )
+
+fun BudgetEntity.toFirestoreMap(): Map<String, Any> = mapOf(
+    "id" to id,
+    "categoryId" to categoryId,
+    "month" to month,
+    "limitCents" to limitCents,
+    "updatedAt" to updatedAt,
+    "isDeleted" to isDeleted
+)
+
+fun DocumentSnapshot.toBudgetEntity() : BudgetEntity? {
+    return try {
+        BudgetEntity(
+            id = getString("id") ?: id,
+            categoryId = getString("categoryId") ?: return null,
+            month = getString("month") ?: return null,
+            limitCents = getLong("limitCents") ?: return null,
+            updatedAt = getLong("updatedAt") ?: return null,
+            isDeleted = getBoolean("isDeleted") ?: false,
+            syncStatus = "SYNCED"
+        )
+    } catch (e: Exception) {
+        null
+    }
+}

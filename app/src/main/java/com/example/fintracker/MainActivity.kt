@@ -22,29 +22,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FinTrackerTheme {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "transactions") {
-                    composable("transactions") {
-                        TransactionScreen(showDebugControls = BuildConfig.DEBUG)
-                    }
-                }
+                FinTrackApp()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FinTrackerTheme {
-        Greeting("Android")
     }
 }

@@ -26,4 +26,7 @@ interface AccountDao {
     @Query("UPDATE accounts SET syncStatus = 'SYNCED' WHERE id = :id")
     suspend fun markSynced(id: String)
 
+    @Query( "SELECT * FROM accounts WHERE id=:id")
+    suspend fun getById(id: String): AccountEntity?
+
 }

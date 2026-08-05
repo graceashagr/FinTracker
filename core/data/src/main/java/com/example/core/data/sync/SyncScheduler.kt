@@ -24,7 +24,7 @@ fun scheduleSyncWork(context: Context) {
         .build()
 
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        "sync_transactions",
+        "sync_action",
         ExistingPeriodicWorkPolicy.KEEP,
         periodicRequest
     )
@@ -41,7 +41,7 @@ fun triggerImmediateSync(context: Context) {
         .build()
 
     WorkManager.getInstance(context).enqueueUniqueWork(
-        "sync_transactions_immediate",
+        "sync_action_immediate",
         ExistingWorkPolicy.KEEP,
         request
     )

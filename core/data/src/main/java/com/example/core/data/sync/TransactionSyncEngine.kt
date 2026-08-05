@@ -5,7 +5,7 @@ import com.example.core.data.sync.SyncMetadataDao
 import com.example.core.data.local.dao.TransactionDao
 import com.example.core.data.local.entity.SyncMetadataEntity
 import com.example.core.data.local.entity.TransactionEntity
-import com.example.core.data.remote.source.TransactionRemoteDataSource
+import com.example.core.data.remote.source.FireStoreRemoteDataSource
 import com.example.core.domain.sync.SyncEngine
 import com.example.core.domain.sync.SyncResult
 import javax.inject.Inject
@@ -14,12 +14,13 @@ import kotlin.time.ExperimentalTime
 
 class TransactionSyncEngine @Inject constructor(
     private val dao : TransactionDao,
-    private val transactionRemoteDataSource: TransactionRemoteDataSource,
+    private val remoteDataSource: FireStoreRemoteDataSource<TransactionEntity>,
     private val syncMetaDao: SyncMetadataDao,
     private val conflictResolver: TransactionConflictResolver
 ): SyncEngine
 {
-    override suspend fun syncTransactions(): SyncResult = runCatching {
+    override val entityName: String = "transactions"
+    override suspend fun sync(): SyncResult = runCatching {
         pullRemoteChanges()
         pushLocalChanges()
     }.fold(
@@ -35,7 +36,7 @@ class TransactionSyncEngine @Inject constructor(
         Log.d("SyncEngine", "Found ${pending.size} pending transactions")
         pending.forEach { local ->
             Log.d("SyncEngine", "Pushing ${local.id}")
-            transactionRemoteDataSource.push(local)
+            remoteDataSource.push(local)
             dao.markSynced(local.id)
             Log.d("SyncEngine", "Marked synced: ${local.id}")
         }
@@ -44,7 +45,7 @@ class TransactionSyncEngine @Inject constructor(
     @OptIn(ExperimentalTime::class)
     private suspend fun pullRemoteChanges() {
         val lastSync = syncMetaDao.getLastSyncedAt("transactions") ?: 0L
-        val remoteChanges = transactionRemoteDataSource.pullChangedSince(lastSync)
+        val remoteChanges = remoteDataSource.pullChangedSince(lastSync)
 
         remoteChanges.forEach { incoming ->
             val local = dao.getById(incoming.id)

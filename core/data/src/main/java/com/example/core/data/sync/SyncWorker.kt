@@ -19,13 +19,13 @@ import java.util.concurrent.TimeUnit
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val syncEngine: SyncEngine
+    private val syncEngines: Set<@JvmSuppressWildcards SyncEngine>
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        return when (val result = syncEngine.syncTransactions()) {
-            is SyncResult.Success -> Result.success()
-            is SyncResult.Failure -> Result.failure()
+        val results = syncEngines.map {
+            it.sync()
         }
+        return if(results.all { it is SyncResult.Success }) Result.success() else Result.retry()
     }
 }
